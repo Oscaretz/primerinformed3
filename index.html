@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard Oscar D3.js</title>
+  <title>Dashboard D3.js</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
   <style>
     * {
@@ -12,6 +12,7 @@
     }
     body {
       margin: 20px;
+      background: #f9f9f9;
     }
     .dashboard-section {
       margin-bottom: 40px;
@@ -21,12 +22,10 @@
     }
     svg {
       border: 1px solid #aaa;
-      background: #f4f4f4;
+      background: #f0f0f0;
     }
   </style>
-
   <script>
-    // Visualización de coordenadas al mover el mouse sobre un SVG
     function coordsPixels(selector) {
       const svg = d3.select(selector).attr('cursor', 'crosshair');
 
@@ -44,36 +43,34 @@
       });
     }
 
-    // Aquí puedes agregar más funciones para otros dashboards
     function initDashboard() {
-      coordsPixels('#coords');  // Activa el SVG de coordenadas
-      // Llama otras funciones aquí para más dashboards
+      coordsPixels('#coords');  // activa el dashboard de coordenadas
+      // Aquí puedes inicializar los otros dashboards si necesitas más código JS
     }
 
     window.onload = initDashboard;
   </script>
 </head>
-
 <body>
 
-  <h1>Dashboard D3.js - Visualizaciones</h1>
+  <h1>Dashboard D3.js - Visualizaciones Combinadas</h1>
 
-  <!-- Sección 1: Visualización de Coordenadas -->
+  <!-- Dashboard 1: Coordenadas del Mouse -->
   <div class="dashboard-section">
     <h2>1. Coordenadas del Mouse</h2>
     <svg id="coords" width="400" height="300"></svg>
   </div>
 
-  <!-- Sección 2: Otra visualización de ejemplo -->
+  <!-- Dashboard 2: Otra visualización ya existente -->
   <div class="dashboard-section">
-    <h2>2. Otra gráfica con D3 (por ejemplo, una barra)</h2>
-    <svg id="barras" width="400" height="300"></svg>
+    <h2>2. Dashboard de ejemplo (en espera de implementación)</h2>
+    <svg id="dashboard2" width="400" height="300"></svg>
   </div>
 
-  <!-- Sección 3: Puedes seguir añadiendo más gráficas aquí -->
+  <!-- Dashboard 3: Otro dashboard adicional -->
   <div class="dashboard-section">
     <h2>3. Otra visualización futura</h2>
-    <svg id="futuro" width="400" height="300"></svg>
+    <svg id="dashboard3" width="400" height="300"></svg>
   </div>
 
 </body>
