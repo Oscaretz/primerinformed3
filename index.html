@@ -8,9 +8,25 @@
   <style>
     * {
       font-family: sans-serif;
+      box-sizing: border-box;
+    }
+    body {
+      margin: 20px;
+    }
+    .dashboard-section {
+      margin-bottom: 40px;
+    }
+    h2 {
+      margin-bottom: 10px;
+    }
+    svg {
+      border: 1px solid #aaa;
+      background: #f4f4f4;
     }
   </style>
+
   <script>
+    // Visualización de coordenadas al mover el mouse sobre un SVG
     function coordsPixels(selector) {
       const svg = d3.select(selector).attr('cursor', 'crosshair');
 
@@ -28,19 +44,37 @@
       });
     }
 
-    // Ejecutar al cargar
-    window.onload = () => {
-      coordsPixels('#coords');
-    };
+    // Aquí puedes agregar más funciones para otros dashboards
+    function initDashboard() {
+      coordsPixels('#coords');  // Activa el SVG de coordenadas
+      // Llama otras funciones aquí para más dashboards
+    }
+
+    window.onload = initDashboard;
   </script>
 </head>
 
 <body>
-  <h1>Dashboard con Coordenadas</h1>
 
-  <svg id="coords" width="400" height="300" style="background: lightgrey; border: 1px solid #aaa;">
-    <!-- Aquí se mostrará el texto -->
-  </svg>
+  <h1>Dashboard D3.js - Visualizaciones</h1>
+
+  <!-- Sección 1: Visualización de Coordenadas -->
+  <div class="dashboard-section">
+    <h2>1. Coordenadas del Mouse</h2>
+    <svg id="coords" width="400" height="300"></svg>
+  </div>
+
+  <!-- Sección 2: Otra visualización de ejemplo -->
+  <div class="dashboard-section">
+    <h2>2. Otra gráfica con D3 (por ejemplo, una barra)</h2>
+    <svg id="barras" width="400" height="300"></svg>
+  </div>
+
+  <!-- Sección 3: Puedes seguir añadiendo más gráficas aquí -->
+  <div class="dashboard-section">
+    <h2>3. Otra visualización futura</h2>
+    <svg id="futuro" width="400" height="300"></svg>
+  </div>
 
 </body>
 </html>
