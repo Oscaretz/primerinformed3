@@ -214,6 +214,16 @@
                 </div>
             </div>
 
+            <div class="chart-container">
+                <div class="chart-title">🖌️ Brush Interactivo</div>
+                <div style="display: flex; justify-content: center; gap: 10px;">
+                    <svg id="brush1" width="280" height="280" style="background:lightgrey; border-radius: 8px;">
+                    </svg>
+                    <svg id="brush2" width="280" height="280" style="background:lightgrey; border-radius: 8px;">
+                    </svg>
+                </div>
+            </div>
+
             <div class="chart-container full-width">
                 <div class="chart-title">📊 Tendencia de Usuarios</div>
                 <div id="lineChart"></div>
@@ -233,6 +243,66 @@
                     txt.attr('x', 18 + pt[0])
                         .attr('y', 6 + pt[1])
                         .text('' + pt[0] + ',' + pt[1]);
+                });
+        }
+
+        // Funciones para el brush interactivo
+        function makeBrush() {
+            // Generar datos simulados en lugar de cargar CSV
+            const brushData = [];
+            for (let i = 0; i < 30; i++) {
+                brushData.push({
+                    A: Math.random() * 260 + 20, // x coordinate
+                    B: Math.random() * 260 + 20, // y coordinate
+                    r: 0
+                });
+            }
+
+            var svg1 = d3.select("#brush1"), 
+                svg2 = d3.select("#brush2");
+
+            var sc1 = d3.scaleLinear()
+                .domain([0, 10, 50])
+                .range(["lime", "yellow", "red"]);
+            
+            var sc2 = d3.scaleLinear()
+                .domain([0, 10, 50])
+                .range(["lime", "yellow", "blue"]);
+
+            var cs1 = drawCircles(svg1, brushData, d => d["A"], d => d["B"], sc1);
+            var cs2 = drawCircles(svg2, brushData, d => d["A"], d => d["B"], sc2);
+
+            svg1.call(installHandlers, brushData, cs1, cs2, sc1, sc2);
+        }
+
+        function drawCircles(svg, data, accX, accY, sc) {
+            var color = sc(Infinity);
+            return svg.selectAll("circle")
+                .data(data)
+                .enter()
+                .append("circle")
+                .attr("r", 5)
+                .attr("cx", accX)
+                .attr("cy", accY)
+                .attr("fill", color)
+                .attr("fill-opacity", 0.4);
+        }
+
+        function installHandlers(svg, data, cs1, cs2, sc1, sc2) {
+            svg.attr("cursor", "crosshair")
+                .on("mousemove", function() {
+                    var pt = d3.mouse(svg.node());
+                    cs1.attr("fill", function(d, i) {
+                        var r = Math.hypot(pt[0] - d3.select(this).attr("cx"),
+                                         pt[1] - d3.select(this).attr("cy"));
+                        data[i]["r"] = r;
+                        return sc1(r);
+                    })
+                    cs2.attr("fill", (d, i) => sc2(data[i]["r"]));
+                })
+                .on("mouseleave", function() {
+                    cs1.attr("fill", sc1(Infinity));
+                    cs2.attr("fill", sc2(Infinity));
                 });
         }
 
@@ -569,6 +639,8 @@
             createLineChart();
             // Inicializar el gráfico de coordenadas pixel
             coordsPixels('#coords');
+            // Inicializar el brush interactivo
+            makeBrush();
         }
 
         // Ejecutar cuando el DOM esté listo
