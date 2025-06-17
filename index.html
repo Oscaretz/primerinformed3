@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard D3.js</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .dashboard {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            color: #2c3e50;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            font-weight: 300;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            transform: translateY(0);
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .stat-value {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .chart-container {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+            transition: transform 0.3s ease;
+        }
+
+        .chart-container:hover {
+            transform: translateY(-2px);
+        }
+
+        .chart-title {
+            font-size: 1.3em;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        .tooltip {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 12px;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 1000;
+        }
+
+        .axis {
+            font-size: 12px;
+        }
+
+        .bar {
+            transition: all 0.3s ease;
+        }
+
+        .bar:hover {
+            opacity: 0.7;
+        }
+
+        .line {
+            fill: none;
+            stroke-width: 3;
+            stroke: #667eea;
+        }
+
+        .dot {
+            fill: #667eea;
+            stroke: white;
+            stroke-width: 2;
+        }
+
+        .arc {
+            transition: all 0.3s ease;
+        }
+
+        .arc:hover {
+            opacity: 0.8;
+        }
+
+        @media (max-width: 768px) {
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .dashboard {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <div class="header">
+            <h1>📊 Dashboard Interactivo</h1>
+            <p>Visualización de datos con D3.js</p>
+        </div>
+
+        <div class="stats-grid" id="stats"></div>
+
+        <div class="charts-grid">
+            <div class="chart-container">
+                <div class="chart-title">📈 Ventas por Mes</div>
+                <div id="barChart"></div>
+            </div>
+
+            <div class="chart-container">
+                <div class="chart-title">🥧 Distribución por Categoría</div>
+                <div id="pieChart"></div>
+            </div>
+
+            <div class="chart-container full-width">
+                <div class="chart-title">📊 Tendencia de Usuarios</div>
+                <div id="lineChart"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="tooltip" id="tooltip"></div>
+
+    <script>
+        // Datos de ejemplo
+        const salesData = [
+            { month: 'Ene', sales: 45000, users: 1200 },
+            { month: 'Feb', sales: 52000, users: 1350 },
+            { month: 'Mar', sales: 48000, users: 1280 },
+            { month: 'Abr', sales: 61000, users: 1450 },
+            { month: 'May', sales: 55000, users: 1380 },
+            { month: 'Jun', sales: 67000, users: 1520 }
+        ];
+
+        const categoryData = [
+            { category: 'Electrónicos', value: 35, color: '#667eea' },
+            { category: 'Ropa', value: 25, color: '#764ba2' },
+            { category: 'Hogar', value: 20, color: '#f093fb' },
+            { category: 'Deportes', value: 12, color: '#f5576c' },
+            { category: 'Otros', value: 8, color: '#4facfe' }
+        ];
+
+        // Configuración general
+        const tooltip = d3.select('#tooltip');
+
+        // Función para mostrar tooltip
+        function showTooltip(event, content) {
+            tooltip
+                .style('opacity', 1)
+                .html(content)
+                .style('left', (event.pageX + 10) + 'px')
+                .style('top', (event.pageY - 10) + 'px');
+        }
+
+        function hideTooltip() {
+            tooltip.style('opacity', 0);
+        }
+
+        // Crear tarjetas de estadísticas
+        function createStatsCards() {
+            const stats = [
+                { label: 'Ventas Totales', value: '$328K', icon: '💰' },
+                { label: 'Usuarios Activos', value: '8.2K', icon: '👥' },
+                { label: 'Productos', value: '1,247', icon: '📦' },
+                { label: 'Conversión', value: '3.2%', icon: '📈' }
+            ];
+
+            const statsContainer = d3.select('#stats');
+            
+            const cards = statsContainer.selectAll('.stat-card')
+                .data(stats)
+                .enter()
+                .append('div')
+                .attr('class', 'stat-card')
+                .style('opacity', 0)
+                .style('transform', 'translateY(20px)');
+
+            cards.append('div')
+                .attr('class', 'stat-value')
+                .text(d => d.value);
+
+            cards.append('div')
+                .attr('class', 'stat-label')
+                .text(d => `${d.icon} ${d.label}`);
+
+            // Animación de entrada
+            cards.transition()
+                .duration(800)
+                .delay((d, i) => i * 100)
+                .style('opacity', 1)
+                .style('transform', 'translateY(0)');
+        }
+
+        // Gráfico de barras
+        function createBarChart() {
+            const margin = { top: 20, right: 30, bottom: 40, left: 60 };
+            const width = 400 - margin.left - margin.right;
+            const height = 300 - margin.top - margin.bottom;
+
+            const svg = d3.select('#barChart')
+                .append('svg')
+                .attr('width', width + margin.left + margin.right)
+                .attr('height', height + margin.top + margin.bottom);
+
+            const g = svg.append('g')
+                .attr('transform', `translate(${margin.left},${margin.top})`);
+
+            const x = d3.scaleBand()
+                .domain(salesData.map(d => d.month))
+                .range([0, width])
+                .padding(0.2);
+
+            const y = d3.scaleLinear()
+                .domain([0, d3.max(salesData, d => d.sales)])
+                .range([height, 0]);
+
+            // Ejes
+            g.append('g')
+                .attr('class', 'axis')
+                .attr('transform', `translate(0,${height})`)
+                .call(d3.axisBottom(x));
+
+            g.append('g')
+                .attr('class', 'axis')
+                .call(d3.axisLeft(y).tickFormat(d => `$${d/1000}K`));
+
+            // Barras
+            const bars = g.selectAll('.bar')
+                .data(salesData)
+                .enter()
+                .append('rect')
+                .attr('class', 'bar')
+                .attr('x', d => x(d.month))
+                .attr('width', x.bandwidth())
+                .attr('y', height)
+                .attr('height', 0)
+                .attr('fill', 'url(#barGradient)');
+
+            // Gradiente para las barras
+            const defs = svg.append('defs');
+            const gradient = defs.append('linearGradient')
+                .attr('id', 'barGradient')
+                .attr('gradientUnits', 'userSpaceOnUse')
+                .attr('x1', 0).attr('y1', height)
+                .attr('x2', 0).attr('y2', 0);
+
+            gradient.append('stop')
+                .attr('offset', '0%')
+                .attr('stop-color', '#667eea');
+
+            gradient.append('stop')
+                .attr('offset', '100%')
+                .attr('stop-color', '#764ba2');
+
+            // Animación y eventos
+            bars.on('mouseover', function(event, d) {
+                    showTooltip(event, `<strong>${d.month}</strong><br>Ventas: $${d.sales.toLocaleString()}`);
+                })
+                .on('mouseout', hideTooltip)
+                .transition()
+                .duration(800)
+                .delay((d, i) => i * 100)
+                .attr('y', d => y(d.sales))
+                .attr('height', d => height - y(d.sales));
+        }
+
+        // Gráfico circular (pie chart)
+        function createPieChart() {
+            const width = 350;
+            const height = 300;
+            const radius = Math.min(width, height) / 2 - 20;
+
+            const svg = d3.select('#pieChart')
+                .append('svg')
+                .attr('width', width)
+                .attr('height', height);
+
+            const g = svg.append('g')
+                .attr('transform', `translate(${width/2},${height/2})`);
+
+            const pie = d3.pie()
+                .value(d => d.value)
+                .sort(null);
+
+            const arc = d3.arc()
+                .innerRadius(radius * 0.4)
+                .outerRadius(radius);
+
+            const arcHover = d3.arc()
+                .innerRadius(radius * 0.4)
+                .outerRadius(radius * 1.1);
+
+            const arcs = g.selectAll('.arc')
+                .data(pie(categoryData))
+                .enter()
+                .append('g')
+                .attr('class', 'arc');
+
+            arcs.append('path')
+                .attr('d', arc)
+                .attr('fill', d => d.data.color)
+                .style('opacity', 0)
+                .on('mouseover', function(event, d) {
+                    d3.select(this)
+                        .transition()
+                        .duration(200)
+                        .attr('d', arcHover);
+                    showTooltip(event, `<strong>${d.data.category}</strong><br>${d.data.value}%`);
+                })
+                .on('mouseout', function() {
+                    d3.select(this)
+                        .transition()
+                        .duration(200)
+                        .attr('d', arc);
+                    hideTooltip();
+                })
+                .transition()
+                .duration(800)
+                .delay((d, i) => i * 100)
+                .style('opacity', 1);
+
+            // Etiquetas
+            arcs.append('text')
+                .attr('transform', d => `translate(${arc.centroid(d)})`)
+                .attr('text-anchor', 'middle')
+                .style('font-size', '12px')
+                .style('font-weight', 'bold')
+                .style('fill', 'white')
+                .style('opacity', 0)
+                .text(d => d.data.value + '%')
+                .transition()
+                .duration(800)
+                .delay((d, i) => i * 100 + 400)
+                .style('opacity', 1);
+        }
+
+        // Gráfico de líneas
+        function createLineChart() {
+            const margin = { top: 20, right: 30, bottom: 40, left: 60 };
+            const width = 800 - margin.left - margin.right;
+            const height = 300 - margin.top - margin.bottom;
+
+            const svg = d3.select('#lineChart')
+                .append('svg')
+                .attr('width', width + margin.left + margin.right)
+                .attr('height', height + margin.top + margin.bottom);
+
+            const g = svg.append('g')
+                .attr('transform', `translate(${margin.left},${margin.top})`);
+
+            const x = d3.scaleBand()
+                .domain(salesData.map(d => d.month))
+                .range([0, width])
+                .padding(0.1);
+
+            const y = d3.scaleLinear()
+                .domain([0, d3.max(salesData, d => d.users)])
+                .range([height, 0]);
+
+            const line = d3.line()
+                .x(d => x(d.month) + x.bandwidth() / 2)
+                .y(d => y(d.users))
+                .curve(d3.curveMonotoneX);
+
+            // Ejes
+            g.append('g')
+                .attr('class', 'axis')
+                .attr('transform', `translate(0,${height})`)
+                .call(d3.axisBottom(x));
+
+            g.append('g')
+                .attr('class', 'axis')
+                .call(d3.axisLeft(y));
+
+            // Área bajo la línea
+            const area = d3.area()
+                .x(d => x(d.month) + x.bandwidth() / 2)
+                .y0(height)
+                .y1(d => y(d.users))
+                .curve(d3.curveMonotoneX);
+
+            g.append('path')
+                .datum(salesData)
+                .attr('fill', 'url(#areaGradient)')
+                .attr('opacity', 0.3)
+                .attr('d', area);
+
+            // Gradiente para el área
+            const defs = svg.append('defs');
+            const areaGradient = defs.append('linearGradient')
+                .attr('id', 'areaGradient')
+                .attr('gradientUnits', 'userSpaceOnUse')
+                .attr('x1', 0).attr('y1', height)
+                .attr('x2', 0).attr('y2', 0);
+
+            areaGradient.append('stop')
+                .attr('offset', '0%')
+                .attr('stop-color', '#667eea')
+                .attr('stop-opacity', 0);
+
+            areaGradient.append('stop')
+                .attr('offset', '100%')
+                .attr('stop-color', '#667eea')
+                .attr('stop-opacity', 0.8);
+
+            // Línea principal
+            const path = g.append('path')
+                .datum(salesData)
+                .attr('class', 'line')
+                .attr('d', line);
+
+            // Animación de la línea
+            const totalLength = path.node().getTotalLength();
+            path
+                .attr('stroke-dasharray', totalLength + ' ' + totalLength)
+                .attr('stroke-dashoffset', totalLength)
+                .transition()
+                .duration(2000)
+                .attr('stroke-dashoffset', 0);
+
+            // Puntos en la línea
+            g.selectAll('.dot')
+                .data(salesData)
+                .enter()
+                .append('circle')
+                .attr('class', 'dot')
+                .attr('cx', d => x(d.month) + x.bandwidth() / 2)
+                .attr('cy', d => y(d.users))
+                .attr('r', 0)
+                .on('mouseover', function(event, d) {
+                    d3.select(this)
+                        .transition()
+                        .duration(100)
+                        .attr('r', 8);
+                    showTooltip(event, `<strong>${d.month}</strong><br>Usuarios: ${d.users.toLocaleString()}`);
+                })
+                .on('mouseout', function() {
+                    d3.select(this)
+                        .transition()
+                        .duration(100)
+                        .attr('r', 5);
+                    hideTooltip();
+                })
+                .transition()
+                .duration(500)
+                .delay((d, i) => i * 100 + 1000)
+                .attr('r', 5);
+        }
+
+        // Inicializar dashboard
+        function initDashboard() {
+            createStatsCards();
+            createBarChart();
+            createPieChart();
+            createLineChart();
+        }
+
+        // Ejecutar cuando el DOM esté listo
+        document.addEventListener('DOMContentLoaded', initDashboard);
+    </script>
+</body>
+</html>
