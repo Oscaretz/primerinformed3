@@ -462,9 +462,6 @@
                 <button class="btn" onclick="toggleAnimations()">
                     <i class="fas fa-play"></i> Change animations
                 </button>
-               <!--  <button class="btn" onclick="exportDashboard()">
-                    <i class="fas fa-download"></i> Export
-                </button>  -->
             </div>
             <div class="instructions">
                 <strong>Instrucciones:</strong> Interact with each visualization using the mouse.
@@ -558,17 +555,19 @@
     <div class="tooltip" id="tooltip"></div>
 
     <script>
-        // Configuración global
+        // Variables globales para controlar estado
         let animationsEnabled = true;
+        let lissajousTimer = null;
+        let chartsInitialized = false;
         
-        // Datos de estadísticas mejorados
+        // Datos de estadísticas
         const stats = [
             { value: '100%', label: 'Interactive', icon: 'fas fa-mouse-pointer' },
             { value: 'D3.js', label: 'Tools', icon: 'fas fa-code' },
             { value: 'Real-time', label: 'Refresh', icon: 'fas fa-sync-alt' }
         ];
 
-        // Tooltip mejorado
+        // Tooltip
         const tooltip = d3.select('#tooltip');
 
         function showTooltip(event, content) {
@@ -583,9 +582,12 @@
             tooltip.style('opacity', 0);
         }
 
-        // Crear tarjetas de estadísticas mejoradas
+        // Crear tarjetas de estadísticas (solo una vez)
         function createStatsCards() {
             const statsContainer = d3.select('#stats');
+            
+            // Limpiar contenido existente
+            statsContainer.selectAll("*").remove();
             
             const cards = statsContainer.selectAll('.stat-card')
                 .data(stats)
@@ -619,9 +621,13 @@
                 .style('transform', 'translateY(0)');
         }
 
-        // Visualización 1: Coordenadas de Píxeles mejorada
+        // Visualización 1: Coordenadas de Píxeles
         function createCoordsPixels() {
             const container = d3.select("#coordsChart");
+            
+            // Limpiar contenido existente
+            container.selectAll("*").remove();
+            
             const svgWidth = 400;
             const svgHeight = 300;
 
@@ -632,10 +638,9 @@
                 .attr("cursor", "crosshair")
                 .style("background", "linear-gradient(45deg, #f8fafc, #e2e8f0)");
 
-            // Agregar grid de fondo
+            // Grid de fondo
             const grid = svg.append("g").attr("class", "grid");
             
-            // Líneas verticales
             for (let i = 0; i <= svgWidth; i += 40) {
                 grid.append("line")
                     .attr("x1", i).attr("y1", 0)
@@ -644,7 +649,6 @@
                     .attr("stroke-width", 1);
             }
             
-            // Líneas horizontales
             for (let i = 0; i <= svgHeight; i += 40) {
                 grid.append("line")
                     .attr("x1", 0).attr("y1", i)
@@ -653,7 +657,6 @@
                     .attr("stroke-width", 1);
             }
 
-            // Texto de coordenadas
             const coordText = svg.append('text')
                 .attr('class', 'coord-text')
                 .style('fill', '#2c3e50')
@@ -661,7 +664,6 @@
                 .style('font-size', '14px')
                 .style('pointer-events', 'none');
 
-            // Círculo seguidor
             const follower = svg.append('circle')
                 .attr('r', 8)
                 .attr('fill', '#667eea')
@@ -691,8 +693,12 @@
             });
         }
 
-        // Visualización 2: Brush Interactivo mejorado
+        // Visualización 2: Brush Interactivo
         function createBrushCharts() {
+            // Limpiar contenido existente
+            d3.select("#brush1").selectAll("*").remove();
+            d3.select("#brush2").selectAll("*").remove();
+            
             const brushData = Array.from({length: 80}, (_, i) => ({
                 A: Math.random() * 260 + 20,
                 B: Math.random() * 260 + 20,
@@ -763,12 +769,17 @@
             }
         }
 
-        // Visualización 3: Drag and Drop mejorado
+        // Visualización 3: Drag and Drop
         function createDragDropChart() {
+            const container = d3.select("#dragDropChart");
+            
+            // Limpiar contenido existente
+            container.selectAll("*").remove();
+            
             const svgWidth = 500;
             const svgHeight = 250;
 
-            const svg = d3.select("#dragDropChart")
+            const svg = container
                 .append("svg")
                 .attr("width", svgWidth)
                 .attr("height", svgHeight)
@@ -826,7 +837,6 @@
                         .attr("stroke-width", 3)
                         .attr("r", 25);
                     
-                    // Actualizar datos
                     d.x = event.x;
                     d.y = event.y;
                     widget = undefined;
@@ -835,197 +845,14 @@
             drag(circles);
         }
 
-        // Visualización 4: Stagger Animation mejorada
+        // Visualización 4: Stagger Animation
         function createStaggerChart() {
+            const container = d3.select("#staggerChart");
+            
+            // Limpiar contenido existente
+            container.selectAll("*").remove();
+            
             let ds1 = [2, 1, 3, 5, 7, 8, 9, 9, 9, 8, 7, 5, 3, 1, 2];
             let ds2 = [8, 9, 8, 7, 5, 3, 2, 1, 2, 3, 5, 7, 8, 9, 8];
             const n = ds1.length;
             const mx = d3.max(d3.merge([ds1, ds2]));
-            
-            const svgWidth = 500;
-            const svgHeight = 300;
-            
-            const svg = d3.select("#staggerChart")
-                .append("svg")
-                .attr("width", svgWidth)
-                .attr("height", svgHeight)
-                .style("background", "linear-gradient(45deg, #f8fafc, #e2e8f0)")
-                .style("cursor", "pointer");
-
-            const scX = d3.scaleLinear().domain([0, n]).range([50, 450]);
-            const scY = d3.scaleLinear().domain([0, mx]).range([250, 50]);
-
-            // Agregar instrucciones
-            svg.append("text")
-                .attr("x", svgWidth/2)
-                .attr("y", 30)
-                .attr("text-anchor", "middle")
-                .style("fill", "#64748b")
-                .style("font-size", "12px")
-                .text("Haz clic para animar");
-
-            const bars = svg.selectAll("line")
-                .data(ds1)
-                .enter()
-                .append("line")
-                .attr("stroke", "#667eea")
-                .attr("stroke-width", 20)
-                .attr("stroke-linecap", "round")
-                .attr("x1", (d, i) => scX(i))
-                .attr("y1", scY(0))
-                .attr("x2", (d, i) => scX(i))
-                .attr("y2", d => scY(d))
-                .style("filter", "drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1))")
-                .on("mouseenter", function() {
-                    d3.select(this).attr("stroke", "#f59e0b");
-                })
-                .on("mouseleave", function() {
-                    d3.select(this).attr("stroke", "#667eea");
-                });
-
-            svg.on("click", function() {
-                [ds1, ds2] = [ds2, ds1];
-                bars.data(ds1)
-                    .transition()
-                    .duration(1000)
-                    .delay((d, i) => 100 * i)
-                    .attr("y2", d => scY(d))
-                    .attr("stroke", "#10b981");
-                
-                setTimeout(() => {
-                    bars.attr("stroke", "#667eea");
-                }, 2000);
-            });
-        }
-
-        // Visualización 5: Curva de Lissajous mejorada
-        function createLissajousChart() {
-            const svgWidth = 400;
-            const svgHeight = 400;
-            
-            const svg = d3.select("#lissajousChart")
-                .append("svg")
-                .attr("width", svgWidth)
-                .attr("height", svgHeight)
-                .style("background", "radial-gradient(circle, #1a1a2e, #16213e)");
-
-            let a = 1.9, b = 3.2;
-            let phi, omega = 2 * Math.PI / 10000;
-            
-            let crrX = 200 + 100, crrY = 200 + 0;
-            let prvX = crrX, prvY = crrY;
-            
-            // Agregar centro
-            svg.append("circle")
-                .attr("cx", 200)
-                .attr("cy", 200)
-                .attr("r", 3)
-                .attr("fill", "#667eea")
-                .attr("opacity", 0.5);
-
-            const timer = d3.timer(function(t) {
-                phi = omega * t;
-                
-                crrX = 200 + 100 * Math.cos(a * phi);
-                crrY = 200 + 100 * Math.sin(b * phi);
-                
-                // Desvanecer líneas existentes
-                svg.selectAll("line")
-                    .each(function() {
-                        this.bogus_opacity = (this.bogus_opacity || 1) * 0.99;
-                    })
-                    .attr("stroke-opacity", function() {
-                        return this.bogus_opacity;
-                    })
-                    .filter(function() {
-                        return this.bogus_opacity < 0.05;
-                    })
-                    .remove();
-                
-                // Agregar nueva línea
-                svg.append("line")
-                    .each(function() {
-                        this.bogus_opacity = 1.0;
-                    })
-                    .attr("x1", prvX)
-                    .attr("y1", prvY)
-                    .attr("x2", crrX)
-                    .attr("y2", crrY)
-                    .attr("stroke", "#10b981")
-                    .attr("stroke-width", 2)
-                    .style("filter", "drop-shadow(0 0 3px #10b981)");
-                
-                prvX = crrX;
-                prvY = crrY;
-                
-                if (t > 60000) {
-                    timer.stop();
-                    // Reiniciar después de un tiempo
-                    setTimeout(() => {
-                        svg.selectAll("line").remove();
-                        createLissajousChart();
-                    }, 2000);
-                }
-            });
-        }
-
-        // Funciones del panel de control
-        function resetAllCharts() {
-            // Limpiar todos los contenedores
-            d3.select("#coordsChart").selectAll("*").remove();
-            d3.select("#brush1").selectAll("*").remove();
-            d3.select("#brush2").selectAll("*").remove();
-            d3.select("#dragDropChart").selectAll("*").remove();
-            d3.select("#staggerChart").selectAll("*").remove();
-            d3.select("#lissajousChart").selectAll("*").remove();
-            
-            // Recrear todas las visualizaciones
-            setTimeout(() => {
-                createCoordsPixels();
-                createBrushCharts();
-                createDragDropChart();
-                createStaggerChart();
-                createLissajousChart();
-            }, 500);
-        }
-
-        function toggleAnimations() {
-            animationsEnabled = !animationsEnabled;
-            const btn = event.target;
-            btn.innerHTML = animationsEnabled ? 
-                '<i class="fas fa-pause"></i> Pause animations' : 
-                '<i class="fas fa-play"></i> Continue animations';
-        }
-
-        function exportDashboard() {
-            // Simulación de exportación
-            const btn = event.target;
-            const originalText = btn.innerHTML;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Exportando...';
-            btn.disabled = true;
-            
-            setTimeout(() => {
-                btn.innerHTML = '<i class="fas fa-check"></i> Exportado';
-                setTimeout(() => {
-                    btn.innerHTML = originalText;
-                    btn.disabled = false;
-                }, 1000);
-            }, 2000);
-        }
-
-        // Inicializar dashboard
-        function initDashboard() {
-            // Crear elementos con animación escalonada
-            setTimeout(() => createStatsCards(), 100);
-            setTimeout(() => createCoordsPixels(), 300);
-            setTimeout(() => createBrushCharts(), 500);
-            setTimeout(() => createDragDropChart(), 700);
-            setTimeout(() => createStaggerChart(), 900);
-            setTimeout(() => createLissajousChart(), 1100);
-        }
-
-        // Inicializar cuando el DOM esté listo
-        document.addEventListener('DOMContentLoaded', initDashboard);
-    </script>
-</body>
-</html>
