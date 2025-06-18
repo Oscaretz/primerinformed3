@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard D3.js</title>
+    <title>2Dashboard D3.js</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
@@ -896,76 +896,78 @@
             });
         }
 
-        // Visualización 5: Curva de Lissajous mejorada
-        function createLissajousChart() {
-            const svgWidth = 400;
-            const svgHeight = 400;
-            
-            const svg = d3.select("#lissajousChart")
-                .append("svg")
-                .attr("width", svgWidth)
-                .attr("height", svgHeight)
-                .style("background", "radial-gradient(circle, #1a1a2e, #16213e)");
-
-            let a = 1.9, b = 3.2;
-            let phi, omega = 2 * Math.PI / 10000;
-            
-            let crrX = 200 + 100, crrY = 200 + 0;
-            let prvX = crrX, prvY = crrY;
-            
-            // Agregar centro
-            svg.append("circle")
-                .attr("cx", 200)
-                .attr("cy", 200)
-                .attr("r", 3)
-                .attr("fill", "#667eea")
-                .attr("opacity", 0.5);
-
-            const timer = d3.timer(function(t) {
-                phi = omega * t;
-                
-                crrX = 200 + 100 * Math.cos(a * phi);
-                crrY = 200 + 100 * Math.sin(b * phi);
-                
-                // Desvanecer líneas existentes
-                svg.selectAll("line")
-                    .each(function() {
-                        this.bogus_opacity = (this.bogus_opacity || 1) * 0.99;
-                    })
-                    .attr("stroke-opacity", function() {
-                        return this.bogus_opacity;
-                    })
-                    .filter(function() {
-                        return this.bogus_opacity < 0.05;
-                    })
-                    .remove();
-                
-                // Agregar nueva línea
-                svg.append("line")
-                    .each(function() {
-                        this.bogus_opacity = 1.0;
-                    })
-                    .attr("x1", prvX)
-                    .attr("y1", prvY)
-                    .attr("x2", crrX)
-                    .attr("y2", crrY)
-                    .attr("stroke", "#10b981")
-                    .attr("stroke-width", 2)
-                    .style("filter", "drop-shadow(0 0 3px #10b981)");
-                
-                prvX = crrX;
-                prvY = crrY;
-                
-                if (t > 60000) {
-                    timer.stop();
-                    // Reiniciar después de un tiempo
-                    setTimeout(() => {
-                        svg.selectAll("line").remove();
-                        createLissajousChart();
-                    }, 2000);
-                }
-            });
+        // Visualización 5: Curva de Lissajous mejorada - CORREGIDA
+function createLissajousChart() {
+    const svgWidth = 400;
+    const svgHeight = 400;
+    
+    // SOLUCIÓN: Limpiar cualquier SVG existente antes de crear uno nuevo
+    d3.select("#lissajousChart").selectAll("*").remove();
+    
+    const svg = d3.select("#lissajousChart")
+        .append("svg")
+        .attr("width", svgWidth)
+        .attr("height", svgHeight)
+        .style("background", "radial-gradient(circle, #1a1a2e, #16213e)");
+        
+    let a = 1.9, b = 3.2;
+    let phi, omega = 2 * Math.PI / 10000;
+    
+    let crrX = 200 + 100, crrY = 200 + 0;
+    let prvX = crrX, prvY = crrY;
+    
+    // Agregar centro
+    svg.append("circle")
+        .attr("cx", 200)
+        .attr("cy", 200)
+        .attr("r", 3)
+        .attr("fill", "#667eea")
+        .attr("opacity", 0.5);
+        
+    const timer = d3.timer(function(t) {
+        phi = omega * t;
+        
+        crrX = 200 + 100 * Math.cos(a * phi);
+        crrY = 200 + 100 * Math.sin(b * phi);
+        
+        // Desvanecer líneas existentes
+        svg.selectAll("line")
+            .each(function() {
+                this.bogus_opacity = (this.bogus_opacity || 1) * 0.99;
+            })
+            .attr("stroke-opacity", function() {
+                return this.bogus_opacity;
+            })
+            .filter(function() {
+                return this.bogus_opacity < 0.05;
+            })
+            .remove();
+        
+        // Agregar nueva línea
+        svg.append("line")
+            .each(function() {
+                this.bogus_opacity = 1.0;
+            })
+            .attr("x1", prvX)
+            .attr("y1", prvY)
+            .attr("x2", crrX)
+            .attr("y2", crrY)
+            .attr("stroke", "#10b981")
+            .attr("stroke-width", 2)
+            .style("filter", "drop-shadow(0 0 3px #10b981)");
+        
+        prvX = crrX;
+        prvY = crrY;
+        
+        if (t > 60000) {
+            timer.stop();
+            // Reiniciar después de un tiempo
+            setTimeout(() => {
+                createLissajousChart(); // Ya no necesitas limpiar las líneas aquí
+            }, 2000);
         }
+    });
+}
 
         // Funciones del panel de control
         function resetAllCharts() {
