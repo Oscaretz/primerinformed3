@@ -456,11 +456,11 @@
         <div class="control-panel">
             <h3><i class="fas fa-cogs"></i> Control Panel</h3>
             <div class="controls">
-                <button class="btn" onclick="resetAllCharts()">
+               <!--  <button class="btn" onclick="resetAllCharts()">
                     <i class="fas fa-redo"></i> Restart
                 </button>
                
-               <!--  <button class="btn" onclick="exportDashboard()">
+                <button class="btn" onclick="exportDashboard()">
                     <i class="fas fa-download"></i> Export
                 </button>  -->
             </div>
@@ -773,9 +773,9 @@
                 .style("background", "linear-gradient(45deg, #f8fafc, #e2e8f0)");
 
             const circleData = [
-                { x: 100, y: 125, color: "#ef4444", label: "Rojo" },
-                { x: 250, y: 125, color: "#10b981", label: "Verde" },
-                { x: 400, y: 125, color: "#3b82f6", label: "Azul" }
+                { x: 100, y: 125, color: "#ef4444", label: "Red" },
+                { x: 250, y: 125, color: "#10b981", label: "Green" },
+                { x: 400, y: 125, color: "#3b82f6", label: "Blue" }
             ];
 
             const circles = svg.selectAll("circle")
@@ -792,7 +792,7 @@
                 .style("filter", "drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1))")
                 .on("mouseenter", function(event, d) {
                     d3.select(this).transition().duration(200).attr("r", 28);
-                    showTooltip(event, `<strong>${d.label}</strong><br>Arrastra para mover`);
+                    showTooltip(event, `<strong>${d.label}</strong><br>Drag to move`);
                 })
                 .on("mouseleave", function() {
                     d3.select(this).transition().duration(200).attr("r", 25);
@@ -860,7 +860,7 @@
                 .attr("text-anchor", "middle")
                 .style("fill", "#64748b")
                 .style("font-size", "12px")
-                .text("Haz clic para animar");
+                .text("Click here to animate");
 
             const bars = svg.selectAll("line")
                 .data(ds1)
