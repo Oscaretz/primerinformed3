@@ -421,7 +421,7 @@
     <div class="dashboard">
         <div class="header">
             <h1><i class="fas fa-chart-line"></i>Interactive Dashboard</h1>
-            <p class="subtitle">Visualización avanzada de datos con D3.js</p>
+            <p class="subtitle">Advanced Data Visualization with D3.js</p>
             
             <div class="header-info">
                 <div class="info-card">
@@ -454,21 +454,21 @@
         <div class="stats-grid" id="stats"></div>
 
         <div class="control-panel">
-            <h3><i class="fas fa-cogs"></i> Panel de Control</h3>
+            <h3><i class="fas fa-cogs"></i> Control Panel</h3>
             <div class="controls">
                 <button class="btn" onclick="resetAllCharts()">
-                    <i class="fas fa-redo"></i> Reiniciar Todo
+                    <i class="fas fa-redo"></i> Restart
                 </button>
                 <button class="btn" onclick="toggleAnimations()">
-                    <i class="fas fa-play"></i> Alternar Animaciones
+                    <i class="fas fa-play"></i> Change animations
                 </button>
                 <button class="btn" onclick="exportDashboard()">
-                    <i class="fas fa-download"></i> Exportar
+                    <i class="fas fa-download"></i> Export
                 </button>
             </div>
             <div class="instructions">
-                <strong>Instrucciones:</strong> Interactúa con cada visualización usando el mouse. 
-                Haz clic en los gráficos para activar animaciones, arrastra elementos cuando sea posible.
+                <strong>Instrucciones:</strong> "Interact with each visualization using the mouse.
+                Click on the charts to activate animations, drag elements whenever possible.
             </div>
         </div>
 
@@ -477,12 +477,12 @@
                 <div class="chart-header">
                     <div class="chart-title">
                         <i class="fas fa-crosshairs"></i>
-                        Coordenadas de Píxeles
+                        Pixel Coordinates
                     </div>
                 </div>
                 <div class="chart-description">
-                    Mueve el cursor sobre el área para ver las coordenadas en tiempo real. 
-                    Esta visualización demuestra el seguimiento de posición del mouse.
+                    "Move the cursor over the area to see the coordinates in real time.
+                    This visualization demonstrates mouse position tracking.
                 </div>
                 <div class="chart-content" id="coordsChart"></div>
             </div>
@@ -491,21 +491,21 @@
                 <div class="chart-header">
                     <div class="chart-title">
                         <i class="fas fa-paint-brush"></i>
-                        Brush Interactivo
+                        Interactive Brush
                     </div>
                 </div>
                 <div class="chart-description">
-                    Mueve el cursor sobre el primer gráfico para ver cómo los colores se propagan al segundo. 
-                    Demuestra la interacción entre múltiples visualizaciones.
+                   Move the cursor over the first chart to see how colors propagate to the second.
+                    It demonstrates the interaction between multiple visualizations.
                 </div>
                 <div class="chart-content">
                     <div class="brush-container" id="brushCharts">
                         <div>
-                            <div class="brush-label">Gráfico Principal</div>
+                            <div class="brush-label">Main Dashboard</div>
                             <div id="brush1"></div>
                         </div>
                         <div>
-                            <div class="brush-label">Gráfico Secundario</div>
+                            <div class="brush-label">Seconday Dashboard</div>
                             <div id="brush2"></div>
                         </div>
                     </div>
@@ -520,8 +520,8 @@
                     </div>
                 </div>
                 <div class="chart-description">
-                    Arrastra los círculos para moverlos por el área. Los elementos cambian de color 
-                    durante el arrastre y regresan a su color original al soltarlos.
+                    Move the cursor over the first chart to see how colors propagate to the second.
+                    It demonstrates the interaction between multiple visualizations
                 </div>
                 <div class="chart-content" id="dragDropChart"></div>
             </div>
@@ -534,8 +534,7 @@
                     </div>
                 </div>
                 <div class="chart-description">
-                    Haz clic en cualquier parte del gráfico para activar una animación escalonada 
-                    que transforma las barras con diferentes retrasos.
+                    Click anywhere on the chart to activate a staggered animation that transforms the bars with different delays.
                 </div>
                 <div class="chart-content" id="staggerChart"></div>
             </div>
@@ -544,12 +543,12 @@
                 <div class="chart-header">
                     <div class="chart-title">
                         <i class="fas fa-infinity"></i>
-                        Curva de Lissajous
+                        Lissajous Curve
                     </div>
                 </div>
                 <div class="chart-description">
-                    Una curva matemática generada en tiempo real que crea patrones fascinantes. 
-                    Las líneas se desvanecen gradualmente creando un efecto de cola.
+                    "A mathematical curve generated in real time that creates fascinating patterns.
+                    The lines gradually fade, creating a tail effect
                 </div>
                 <div class="chart-content" id="lissajousChart"></div>
             </div>
