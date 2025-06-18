@@ -462,9 +462,9 @@
                 <button class="btn" onclick="toggleAnimations()">
                     <i class="fas fa-play"></i> Change animations
                 </button>
-                <button class="btn" onclick="exportDashboard()">
+               <!--  <button class="btn" onclick="exportDashboard()">
                     <i class="fas fa-download"></i> Export
-                </button>
+                </button>  -->
             </div>
             <div class="instructions">
                 <strong>Instrucciones:</strong> "Interact with each visualization using the mouse.
@@ -481,7 +481,7 @@
                     </div>
                 </div>
                 <div class="chart-description">
-                    "Move the cursor over the area to see the coordinates in real time.
+                    Move the cursor over the area to see the coordinates in real time.
                     This visualization demonstrates mouse position tracking.
                 </div>
                 <div class="chart-content" id="coordsChart"></div>
@@ -547,7 +547,7 @@
                     </div>
                 </div>
                 <div class="chart-description">
-                    "A mathematical curve generated in real time that creates fascinating patterns.
+                    A mathematical curve generated in real time that creates fascinating patterns.
                     The lines gradually fade, creating a tail effect
                 </div>
                 <div class="chart-content" id="lissajousChart"></div>
@@ -993,8 +993,8 @@
             animationsEnabled = !animationsEnabled;
             const btn = event.target;
             btn.innerHTML = animationsEnabled ? 
-                '<i class="fas fa-pause"></i> Pausar Animaciones' : 
-                '<i class="fas fa-play"></i> Reanudar Animaciones';
+                '<i class="fas fa-pause"></i> Pause animations' : 
+                '<i class="fas fa-play"></i> Continue animations';
         }
 
         function exportDashboard() {
