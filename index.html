@@ -593,7 +593,7 @@
                 .style('opacity', 0)
                 .style('transform', 'translateY(30px)')
                 .on('mouseenter', function(event, d) {
-                    showTooltip(event, `<strong>${d.label}</strong><br>Valor: ${d.value}`);
+                    showTooltip(event, `<strong>${d.label}</strong><br>${d.value}`);
                 })
                 .on('mouseleave', hideTooltip);
 
